@@ -1,5 +1,6 @@
 // - 1：引入express对象第三方对象
 const express = require('express');// 自动逐级向上查找node_modules
+var createError = require('http-errors');
 
 // - 2：创建一个服务器对象
 // let server = http.createServer();
@@ -19,10 +20,7 @@ server.all('*', function(req, res, next) {
   else  next();
 });
 
-// - 3:开启服务器监听端口
-server.listen(8000,()=>{
-  console.log('服务器启动了');
-});
+
 
 
 server.use('/sucai',(req,res,next)=>{
@@ -42,18 +40,36 @@ server.post('/listData/count',(req,res,next)=>{
   console.log(JSON.stringify(req.headers) + '--9999999900000');
 
   res.writeHead(200, {'content-type':'text/html;charset=utf-8'});
-  res.end('77777777');
-   
+  setTimeout(() => {
+    res.end(JSON.stringify(
+      {"data":{
+            "name":"guohq",
+            "age":19
+       },
+       "statusCode":"200"
+      }));
+  }, 5000);
+});
+
+// 当于所有路径都不匹配时,报404,自定义
+server.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
+server.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  console.log('出现错误');
+  // render the error page
+  res.status(err.status || 500);
+  res.write(JSON.stringify(err));
+  res.write(JSON.stringify(err.status));
+  res.end(err.message);
 });
 
 
-
-server.use(()=>{
-
-});
-
-
-// - 4:处理响应
-server.use((req,res) => {   //
-   res.end("hello world");
+// - 3:开启服务器监听端口
+server.listen(8000,()=>{
+  console.log('服务器启动了');
 });
